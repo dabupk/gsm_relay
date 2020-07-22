@@ -165,7 +165,7 @@ bool Sim800l::hangoffCall(){
 
 
 
-bool Sim800l::sendSms(char* number,char* text){
+bool Sim800l::sendSms(String number,char* text){
 
     SIM.print (F("AT+CMGF=1\r")); //set sms to text mode  
     _buffer=_readSerial();

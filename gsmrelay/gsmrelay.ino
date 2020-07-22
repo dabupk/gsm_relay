@@ -6,7 +6,7 @@ Sim800l Sim800l;  //to declare the library
 String textSms;
 int relay=13; // use what you need 
 bool error;
-char* number="+923354478500"; //change to a valid number.
+String number="";
 bool relay_state = LOW;
 unsigned long previousMillis = 0;        // will store last time LED was updated
 unsigned long interval;           // interval at which to turn off (milliseconds)
@@ -42,7 +42,9 @@ void loop(){
 bool user_verified(){
   textSms.toUpperCase();
   textSms.remove(0,textSms.lastIndexOf("+92"));  // remove all the previous meesages, leaving only last message
-  if(textSms.indexOf("+923354478500")!=-1){
+  number = textSms.substring(textSms.indexOf("+92"),textSms.indexOf('"'));
+  Serial.println(number);
+  if(textSms.indexOf("PASS='123'")!=-1){
     return true;
   }
   else{

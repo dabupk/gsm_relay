@@ -63,12 +63,12 @@ class Sim800l
  	bool hangoffCall();
  	uint8_t getCallStatus();   
  	//Methods for sms || Funciones de SMS.
-	bool sendSms(char* number,char* text);	 
+	bool sendSms(String number,char* text);	 
 	String readSms(uint8_t index); //return all the content of sms
 	String listSms(); //return all the content of sms
 	String getNumberSms(uint8_t index); //return the number of the sms..   
 	bool delAllSms();     // return :  OK or ERROR .. 
-    bool delUnreadSms();     // return :  OK or ERROR .. 
+    bool delreadSms();     // return :  OK or ERROR .. 
 	String signalQuality();
 	void setPhoneFunctionality();
 	void activateBearerProfile();
