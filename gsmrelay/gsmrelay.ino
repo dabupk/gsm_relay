@@ -31,7 +31,9 @@ void loop(){
   textSms = Sim800l.listSms(); //list all the unread messages
   Serial.println(textSms);
     if (textSms.indexOf("CMGL:")!=-1){ //first we need to know if the messege is correct. NOT an ERROR
-                if (user_verified()){     // check user verfication             
+                if (user_verified()){     // check user verfication 
+                set_pass();           
+                textSms.toUpperCase(); 
                 time_settings();        // set timer
                 switching();            // set switching
                 }
@@ -39,13 +41,25 @@ void loop(){
          functions();                   // perform various functions
 }
 
+void set_pass(){
+  if (textSms.indexOf("NEW-PASS='")!=-1){
+       String password = textSms.substring((textSms.indexOf("NEW-PASS='")+10),(textSms.indexOf("'",textSms.indexOf("NEW-PASS='")+10)));
+       write_String(10,password);
+   }
+}
+
 bool user_verified(){
-  textSms.toUpperCase();
   textSms.remove(0,textSms.lastIndexOf("+92"));  // remove all the previous meesages, leaving only last message
   number = textSms.substring(textSms.indexOf("+92"),textSms.indexOf('"'));
-  Serial.println(number);
-  if(textSms.indexOf("PASS='123'")!=-1){
-    return true;
+  if(textSms.indexOf("PASS")!=-1){
+    String password = textSms.substring((textSms.indexOf("PASS='")+6),(textSms.indexOf("'",textSms.indexOf("PASS='")+6)));
+    if (password == read_String(10) || password == "12345678"){
+      return true;
+      }
+      else {
+        error=Sim800l.sendSms(number,"Wrong password");
+        return false;
+        } 
   }
   else{
     return false;
@@ -146,4 +160,32 @@ unsigned long EEPROMReadlong(unsigned long address){
     unsigned long one = EEPROM.read(address + 3);
 
     return ((four << 0) & 0xFF) + ((three << 8) & 0xFFFF) + ((two << 16) & 0xFFFFFF) + ((one << 24) & 0xFFFFFFFF);
+}
+
+String read_String(char add)
+{
+  int i;
+  char data[100]; //Max 100 Bytes
+  int len=0;
+  unsigned char k;
+  k=EEPROM.read(add);
+  while(k != '\0' && len<50)   //Read until null character
+  {    
+    k=EEPROM.read(add+len);
+    data[len]=k;
+    len++;
+  }
+  data[len]='\0';
+  return String(data);
+}
+
+void write_String(char add,String data)
+{
+  int _size = data.length();
+  int i;
+  for(i=0;i<_size;i++)
+  {
+    EEPROM.write(add+i,data[i]);
+  }
+  EEPROM.write(add+_size,'\0');   //Add termination null character for String Data
 }
